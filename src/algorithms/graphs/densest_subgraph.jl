@@ -126,12 +126,13 @@ function densest_subgraph(G::AbstractGraph, num_iterations::Int = 40, algorithm=
         part_s, part_t, cut_value = GraphsFlows.mincut(H, s, t, cap, PushRelabelAlgorithm())
         S = [v for v in part_s if 1 ≤ v ≤ n]
 
-        if cut_value ≤ 2.0 * m + 1e-9
+        # S non-empty means a subgraph denser than mid was found (min-cut < 2m).
+        # S empty means all vertices are on the t-side (min-cut = 2m), so no
+        # subgraph with density > mid exists.
+        if !isempty(S)
             low = mid
             best_λ = mid
-            if !isempty(S)
-                best_S = S
-            end
+            best_S = S
         else
             high = mid
         end
